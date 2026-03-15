@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AI Business Problem Solver</title>
+
+<style>
+
+body{
+font-family:Arial;
+background:linear-gradient(135deg,#0f172a,#1e293b);
+color:white;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+margin:0;
+}
+
+.container{
+width:700px;
+background:#111827;
+padding:35px;
+border-radius:15px;
+box-shadow:0 0 25px rgba(0,0,0,0.5);
+}
+
+h1{
+text-align:center;
+margin-bottom:10px;
+}
+
+p{
+text-align:center;
+opacity:0.8;
+}
+
+textarea{
+width:100%;
+height:120px;
+border:none;
+border-radius:10px;
+padding:15px;
+margin-top:15px;
+font-size:15px;
+resize:none;
+}
+
+button{
+width:100%;
+margin-top:15px;
+padding:14px;
+border:none;
+border-radius:10px;
+background:#6366f1;
+color:white;
+font-size:16px;
+cursor:pointer;
+}
+
+button:hover{
+background:#4f46e5;
+}
+
+.result{
+margin-top:20px;
+background:#1f2937;
+padding:15px;
+border-radius:10px;
+min-height:120px;
+white-space:pre-wrap;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>AI Business Problem Solver</h1>
+<p>Describe your business problem and get AI strategy</p>
+
+<textarea id="problem" placeholder="Example: My charcoal briquette business has low sales"></textarea>
+
+<button onclick="analyze()">Analyze Problem</button>
+
+<div class="result" id="result">
+AI analysis will appear here...
+</div>
+
+</div>
+
+<script>
+
+async function analyze(){
+
+let problem = document.getElementById("problem").value;
+
+document.getElementById("result").innerText="Analyzing with AI...";
+
+const API_KEY = "AIzaSyBcr9TfUKsMeiw9hJzLwVfieg1ZhSWm2sY";
+
+const response = await fetch(
+"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key="+API_KEY,
+{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+contents:[
+{
+parts:[
+{
+text:
+"Analyze this business problem and give:\n\n1. Problem analysis\n2. Possible causes\n3. Business solutions\n4. 7 day action plan\n\nProblem:\n"+problem
+}
+]
+}
+]
+})
+}
+);
+
+const data = await response.json();
+
+let text = data.candidates[0].content.parts[0].text;
+
+document.getElementById("result").innerText=text;
+
+}
+
+</script>
+
+</body>
+</html>
