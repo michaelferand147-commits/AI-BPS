@@ -13,12 +13,12 @@ color:white;
 display:flex;
 justify-content:center;
 align-items:center;
-height:100vh;
+min-height:100vh;
 margin:0;
 }
 
 .container{
-width:700px;
+width:720px;
 background:#111827;
 padding:35px;
 border-radius:15px;
@@ -27,12 +27,13 @@ box-shadow:0 0 25px rgba(0,0,0,0.5);
 
 h1{
 text-align:center;
-margin-bottom:10px;
+margin-bottom:5px;
 }
 
 p{
 text-align:center;
 opacity:0.8;
+margin-bottom:20px;
 }
 
 textarea{
@@ -41,7 +42,6 @@ height:120px;
 border:none;
 border-radius:10px;
 padding:15px;
-margin-top:15px;
 font-size:15px;
 resize:none;
 }
@@ -65,10 +65,16 @@ background:#4f46e5;
 .result{
 margin-top:20px;
 background:#1f2937;
-padding:15px;
+padding:18px;
 border-radius:10px;
 min-height:120px;
 white-space:pre-wrap;
+line-height:1.6;
+}
+
+.loading{
+text-align:center;
+opacity:0.7;
 }
 
 </style>
@@ -81,7 +87,9 @@ white-space:pre-wrap;
 <h1>AI Business Problem Solver</h1>
 <p>Describe your business problem and get AI strategy</p>
 
-<textarea id="problem" placeholder="Example: My charcoal briquette business has low sales"></textarea>
+<textarea id="problem"
+placeholder="Example: My charcoal briquette business has low sales">
+</textarea>
 
 <button onclick="analyze()">Analyze Problem</button>
 
@@ -95,14 +103,22 @@ AI analysis will appear here...
 
 async function analyze(){
 
-let problem = document.getElementById("problem").value;
+let problem=document.getElementById("problem").value;
 
-document.getElementById("result").innerText="Analyzing with AI...";
+if(problem.trim()==""){
+document.getElementById("result").innerText="Please write your business problem.";
+return;
+}
 
-const API_KEY = "AIzaSyBcr9TfUKsMeiw9hJzLwVfieg1ZhSWm2sY";
+document.getElementById("result").innerHTML=
+"<div class='loading'>Analyzing with AI...</div>";
 
-const response = await fetch(
-"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key="+API_KEY,
+const API_KEY="AIzaSyBcr9TfUKsMeiw9hJzLwVfieg1ZhSWm2sY";
+
+try{
+
+const response=await fetch(
+"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key="+AIzaSyBcr9TfUKsMeiw9hJzLwVfieg1ZhSWm2sY,
 {
 method:"POST",
 headers:{
@@ -114,7 +130,7 @@ contents:[
 parts:[
 {
 text:
-"Analyze this business problem and give:\n\n1. Problem analysis\n2. Possible causes\n3. Business solutions\n4. 7 day action plan\n\nProblem:\n"+problem
+"You are an expert business consultant.\n\nAnalyze this problem and provide:\n\n1. Problem analysis\n2. Possible causes\n3. Business solutions\n4. 7-day action plan\n\nProblem:\n"+problem
 }
 ]
 }
@@ -123,11 +139,27 @@ text:
 }
 );
 
-const data = await response.json();
+const data=await response.json();
 
-let text = data.candidates[0].content.parts[0].text;
+if(data.candidates){
+
+let text=data.candidates[0].content.parts[0].text;
 
 document.getElementById("result").innerText=text;
+
+}else{
+
+document.getElementById("result").innerText=
+"AI did not return a response.";
+
+}
+
+}catch(error){
+
+document.getElementById("result").innerText=
+"Error: "+error;
+
+}
 
 }
 
